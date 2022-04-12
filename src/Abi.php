@@ -33,10 +33,29 @@ class Abi extends EthereumStatic
      * @throws \InvalidArgumentException
      * @throws \Exception
      */
+//     public function encodeFunction(string $methodName, array $values)
+//     {
+//         $m = $this->getParamDefinition($methodName);
+
+//         if (count($m->inputs) !== count($values)) {
+//             throw new \InvalidArgumentException('Expected ' . count($m->inputs) . ' params but got ' . count($values));
+//         }
+
+//         // [METHOD 4bytes] + [PARAMS]
+//         $params = $this->getSignature($m);
+//         foreach ($values as $i => $val) {
+//             $expectedType = $m->inputs[$i]->type;
+//             $validAbiType = self::convertByAbi($expectedType, $val);
+//             $params .= EthereumStatic::removeHexPrefix($validAbiType->encodedHexVal());
+//         }
+//         return new EthD($params);
+//     }
+//
+//  fiexed by this issue : https://github.com/digitaldonkey/ethereum-php/issues/40
+    
     public function encodeFunction(string $methodName, array $values)
     {
         $m = $this->getParamDefinition($methodName);
-
         if (count($m->inputs) !== count($values)) {
             throw new \InvalidArgumentException('Expected ' . count($m->inputs) . ' params but got ' . count($values));
         }
@@ -46,11 +65,11 @@ class Abi extends EthereumStatic
         foreach ($values as $i => $val) {
             $expectedType = $m->inputs[$i]->type;
             $validAbiType = self::convertByAbi($expectedType, $val);
-            $params .= EthereumStatic::removeHexPrefix($validAbiType->encodedHexVal());
+            $params .= str_pad(EthereumStatic::removeHexPrefix($validAbiType->encodedHexVal()),64,'0',STR_PAD_LEFT);
+
         }
         return new EthD($params);
     }
-
 
     /**
      * Decode return values of Abi $method.
